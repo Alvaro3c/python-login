@@ -1,17 +1,12 @@
-from flask import Flask, render_template, request, jsonify
+from app import app, db
+from app.models.user import User
+
+from flask import request, jsonify
 import jwt
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_sqlalchemy import SQLAlchemy
 import datetime
 from functools import wraps
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secretkey'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///user.db'
-db = SQLAlchemy(app)     
-
-
-    
 #JWT Middleware
 def token_required(f):
     @wraps(f)
@@ -39,10 +34,8 @@ def token_required(f):
 with app.app_context():
     db.create_all()
 
-
-
 #API Endpoints
-@app.route('/home', methods=['GET'])      # this decorator link http route to function
+@app.route('/', methods=['GET'])
 def home():
      return jsonify({'success': True})
 
@@ -83,7 +76,3 @@ def register():
     db.session.commit()
 
     return jsonify({'message':'User registered successfully'})
-
-
-if __name__ == '__main__':
-    app.run(debug=True, port=8000)
